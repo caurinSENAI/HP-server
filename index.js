@@ -7,170 +7,183 @@ const PORT = 7777;
 const pool = new Pool({
   user: "postgres",
   host: "localhost",
-  database: "exercback",
+  database: "hpexerc",
   password: "ds564",
   port: 7007,
 });
 
 app.use(express.json());
 
-app.get("/users", async (req, res) => {
+app.get("/bruxos", async (req, res) => {
   try {
-    const result = await pool.query("SELECT * FROM usuarios");
+    const result = await pool.query("SELECT * FROM bruxo");
     res.json({
       total: result.rowCount,
-      usuarios: result.rows,
+      bruxos: result.rows,
     });
   } catch (error) {
-    console.error("Erro ao obter usuários", error);
-    res.status(500).json("Erro ao obter usuários");
+    console.error("Erro ao obter Bruxos", error);
+    res.status(500).json("Erro ao obter Bruxos");
   }
 });
 
-app.get("/users/:id", async (req, res) => {
+app.get("/bruxos/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await pool.query("SELECT * FROM usuarios WHERE id = $1", [
-      id,
-    ]);
+    const result = await pool.query("SELECT * FROM bruxo WHERE id = $1", [id]);
     if (result.rowCount === 0) {
-      return res.status(404).json("Usuário não encontrado");
+      return res.status(404).json("Bruxo não encontrado");
     } else {
       res.json(result.rows[0]);
     }
   } catch (error) {
-    console.error("Erro ao obter usuário", error);
-    res.status(500).json("Erro ao obter usuário");
+    console.error("Erro ao obter Bruxo", error);
+    res.status(500).json("Erro ao obter Bruxo");
   }
 });
 
-app.post("/users", async (req, res) => {
-  const { nome, sobrenome, data, email } = req.body;
+app.post("/bruxos", async (req, res) => {
+  const { nome, idade, casa, habilidade, sangue, patrono } = req.body;
 
-  const dataNascimento = new Date(data);
-  const hoje = new Date();
-  let idade = hoje.getFullYear() - dataNascimento.getFullYear();
-  const mesAtual = hoje.getMonth();
-  const mesNascimento = dataNascimento.getMonth();
+  let sangues = ["Puro", "Mestiço", "Trouxa"];
+  let casas = ["Grifinoria", "Sonserina", "Corvinal", "Lufa-Lufa"];
+  let habilidades = ["Feitiços", "Raciocinio", "Duelos", "Poções"];
+  let patronos = ["Cervo", "Cachorro", "Gato", "Rato"];
 
-  if (
-    mesAtual < mesNascimento ||
-    (mesAtual === mesNascimento && hoje.getDate() < dataNascimento.getDate())
-  ) {
-    idade--;
+  if (!sangues.includes(sangue)) {
+    return res.status(400).json("O sangue deve ser Puro, Mestiço ou Trouxa.");
   }
 
-  const dia = dataNascimento.getDate();
-  const mes = dataNascimento.getMonth() + 1;
-  let signo = "";
-
-  if ((mes === 1 && dia >= 20) || (mes === 2 && dia <= 18)) {
-    signo = "Aquário";
-  } else if ((mes === 2 && dia >= 19) || (mes === 3 && dia <= 20)) {
-    signo = "Peixes";
-  } else if ((mes === 3 && dia >= 21) || (mes === 4 && dia <= 19)) {
-    signo = "Áries";
-  } else if ((mes === 4 && dia >= 20) || (mes === 5 && dia <= 20)) {
-    signo = "Touro";
-  } else if ((mes === 5 && dia >= 21) || (mes === 6 && dia <= 20)) {
-    signo = "Gêmeos";
-  } else if ((mes === 6 && dia >= 21) || (mes === 7 && dia <= 22)) {
-    signo = "Câncer";
-  } else if ((mes === 7 && dia >= 23) || (mes === 8 && dia <= 22)) {
-    signo = "Leão";
-  } else if ((mes === 8 && dia >= 23) || (mes === 9 && dia <= 22)) {
-    signo = "Virgem";
-  } else if ((mes === 9 && dia >= 23) || (mes === 10 && dia <= 22)) {
-    signo = "Libra";
-  } else if ((mes === 10 && dia >= 23) || (mes === 11 && dia <= 21)) {
-    signo = "Escorpião";
-  } else if ((mes === 11 && dia >= 22) || (mes === 12 && dia <= 21)) {
-    signo = "Sagitário";
-  } else {
-    signo = "Capricórnio";
+  if (!casas.includes(casa)) {
+    return res
+      .status(400)
+      .json("A casa deve ser Grifinoria, Sonserina, Corvinal ou Lufa-Lufa.");
   }
 
+  if (!habilidades.includes(habilidade)) {
+    return res
+      .status(400)
+      .json("A habilidade deve ser Feitiços, Raciocinio, Duelos ou Poções.");
+  }
+
+  if (!patronos.includes(patrono)) {
+    return res
+      .status(400)
+      .json("O patrono deve ser Cervo, Cachorro, Gato ou Rato.");
+  }
   try {
     await pool.query(
-      "INSERT INTO usuarios (nome, sobrenome, data, email, idade, signo) VALUES ($1, $2, $3, $4, $5, $6)",
-      [nome, sobrenome, data, email, idade, signo]
+      "INSERT INTO bruxo (nome, idade, casa, habilidade, sangue, patrono) VALUES ($1, $2, $3, $4, $5, $6)",
+      [nome, idade, casa, habilidade, sangue, patrono]
     );
-    res.send("Usuário criado com sucesso");
+    res.send("Bruxo criado com sucesso");
   } catch (error) {
-    console.error("Erro ao inserir usuário", error);
-    res.status(500).json("Erro ao inserir usuário");
+    console.error("Erro ao inserir Bruxo", error);
+    res.status(500).json("Erro ao inserir Bruxo");
   }
 });
 
-app.put("/users/:id", async (req, res) => {
+app.put("/bruxos/:id", async (req, res) => {
   const { id } = req.params;
-  const { nome, sobrenome, data, email } = req.body;
+  const { nome, idade, casa, habilidade, sangue, patrono } = req.body;
 
-  const dataNascimento = new Date(data);
-  const hoje = new Date();
-  let idade = hoje.getFullYear() - dataNascimento.getFullYear();
-  const mesAtual = hoje.getMonth();
-  const mesNascimento = dataNascimento.getMonth();
-
-  if (
-    mesAtual < mesNascimento ||
-    (mesAtual === mesNascimento && hoje.getDate() < dataNascimento.getDate())
-  ) {
-    idade--;
-  }
-
-  const dia = dataNascimento.getDate();
-  const mes = dataNascimento.getMonth() + 1;
-  let signo = "";
-
-  if ((mes === 1 && dia >= 20) || (mes === 2 && dia <= 18)) {
-    signo = "Aquário";
-  } else if ((mes === 2 && dia >= 19) || (mes === 3 && dia <= 20)) {
-    signo = "Peixes";
-  } else if ((mes === 3 && dia >= 21) || (mes === 4 && dia <= 19)) {
-    signo = "Áries";
-  } else if ((mes === 4 && dia >= 20) || (mes === 5 && dia <= 20)) {
-    signo = "Touro";
-  } else if ((mes === 5 && dia >= 21) || (mes === 6 && dia <= 20)) {
-    signo = "Gêmeos";
-  } else if ((mes === 6 && dia >= 21) || (mes === 7 && dia <= 22)) {
-    signo = "Câncer";
-  } else if ((mes === 7 && dia >= 23) || (mes === 8 && dia <= 22)) {
-    signo = "Leão";
-  } else if ((mes === 8 && dia >= 23) || (mes === 9 && dia <= 22)) {
-    signo = "Virgem";
-  } else if ((mes === 9 && dia >= 23) || (mes === 10 && dia <= 22)) {
-    signo = "Libra";
-  } else if ((mes === 10 && dia >= 23) || (mes === 11 && dia <= 21)) {
-    signo = "Escorpião";
-  } else if ((mes === 11 && dia >= 22) || (mes === 12 && dia <= 21)) {
-    signo = "Sagitário";
-  } else {
-    signo = "Capricórnio";
-  }
   try {
     await pool.query(
-      "UPDATE usuarios SET nome = $1, sobrenome = $2, data = $3,  email = $4, idade = $5, signo = $6 WHERE id = $7",
-      [nome, sobrenome, data, email, idade, signo, id]
+      "UPDATE bruxo SET nome = $1, idade = $2, casa = $3,  habilidade = $4, sangue = $5, patrono = $6 WHERE id = $7",
+      [nome, idade, casa, habilidade, sangue, patrono, id]
     );
-    res.status(200).send("Usuário atualizado com sucesso");
+    res.status(200).send("Bruxo atualizado com sucesso");
   } catch (error) {
-    console.error("Erro ao atualizar usuário", error);
-    res.status(500).json("Erro ao atualizar usuário");
+    console.error("Erro ao atualizar Bruxo", error);
+    res.status(500).json("Erro ao atualizar Bruxo");
   }
 });
 
-app.delete("/users/:id", async (req, res) => {
+app.delete("/bruxos/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    await pool.query("DELETE FROM usuarios WHERE id = $1", [id]);
-    res.status(200).send("Usuário deletado com sucesso");
+    await pool.query("DELETE FROM bruxo WHERE id = $1", [id]);
+    res.status(200).send("Bruxos deletado com sucesso");
   } catch (error) {
-    console.error("Erro ao deletar usuário", error);
-    res.status(500).json("Erro ao deletar usuário");
+    console.error("Erro ao deletar Bruxos", error);
+    res.status(500).json("Erro ao deletar Bruxos");
+  }
+});
+
+//varas
+
+app.get("/vara", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM varinha");
+    res.json({
+      total: result.rowCount,
+      varas: result.rows,
+    });
+  } catch (error) {
+    console.error("Erro ao obter Varainhas", error);
+    res.status(500).json("Erro ao obter Varinhas");
+  }
+});
+
+app.get("/vara/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query("SELECT * FROM varinha WHERE id = $1", [
+      id,
+    ]);
+    if (result.rowCount === 0) {
+      return res.status(404).json("Varinha não encontrada");
+    } else {
+      res.json(result.rows[0]);
+    }
+  } catch (error) {
+    console.error("Erro ao obter Varinha", error);
+    res.status(500).json("Erro ao obter Varinha");
+  }
+});
+
+app.post("/vara", async (req, res) => {
+  const { material, nucleo, comprimento, data_fabric } = req.body;
+
+  try {
+    await pool.query(
+      "INSERT INTO varinha (material, nucleo, comprimento, data_fabric) VALUES ($1, $2, $3, $4)",
+      [material, nucleo, comprimento, data_fabric]
+    );
+    res.send("Varinha criada com sucesso");
+  } catch (error) {
+    console.error("Erro ao inserir Varinha", error);
+    res.status(500).json("Erro ao inserir Varinha");
+  }
+});
+
+app.put("/vara/:id", async (req, res) => {
+  const { id } = req.params;
+  const { material, nucleo, comprimento, data_fabric } = req.body;
+
+  try {
+    await pool.query(
+      "UPDATE varinha SET material = $1, nucleo = $2, comprimento = $3, data_fabric = $4 WHERE id = $5",
+      [material, nucleo, comprimento, data_fabric, id]
+    );
+    res.status(200).send("Varinha atualizada com sucesso");
+  } catch (error) {
+    console.error("Erro ao atualizar Varinha", error);
+    res.status(500).json("Erro ao atualizar Varinha");
+  }
+});
+
+app.delete("/vara/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    await pool.query("DELETE FROM varinha WHERE id = $1", [id]);
+    res.status(200).send("Varinha deletada com sucesso");
+  } catch (error) {
+    console.error("Erro ao deletar Varinha", error);
+    res.status(500).json("Erro ao deletar Varinha");
   }
 });
 
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}🚀`);
+  console.log(`Servidor rodando na porta ${PORT}`);
 });
