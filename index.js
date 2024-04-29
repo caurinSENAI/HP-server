@@ -80,10 +80,11 @@ app.post("/bruxos", async (req, res) => {
       .json("O patrono deve ser Cervo, Cachorro, Gato ou Rato.");
   }
 
+  const patronoFinal = patrono || "Nenhum";
   try {
     await pool.query(
       "INSERT INTO bruxo (nome, idade, casa, habilidade, sangue, patrono) VALUES ($1, $2, $3, $4, $5, $6)",
-      [nome, idade, casa, habilidade, sangue, patrono]
+      [nome, idade, casa, habilidade, sangue, patronoFinal]
     );
     res.send("Bruxo criado com sucesso");
   } catch (error) {
