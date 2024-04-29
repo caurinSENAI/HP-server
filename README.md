@@ -31,7 +31,27 @@ Este projeto é um sistema simples de cadastro de usuários utilizando Node.js, 
 
    ```
 
-2. Acesse o sistema em `http://localhost:7777/users`.
+2. Configure o banco de dados.
+
+   - Confirme que você tem o PostgreSQL instalado e rodando.
+   - Crie o banco de dados com as configurações do arquivo 'script.sql' na pasta 'db'.
+
+3. Configure as informações
+
+   - Na index logo no começo do arquivo, com base nas suas credenciais.
+   - Ex:
+
+   ```javascript
+   const pool = new Pool({
+     user: "nome-do-usuario",
+     host: "localhost",
+     database: "nome-do-banco",
+     password: "senha-do-banco",
+     port: 5432,
+   });
+   ```
+
+4. Acesse o sistema em `http://localhost:7777/bruxos` ou `http://localhost:7777/vara`
 
 # Rotas
 
