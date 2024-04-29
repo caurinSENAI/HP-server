@@ -1,4 +1,4 @@
-# Sistema de Cadastro de Usuários
+# Sistema de Cadastro de Bruxos e Varinhas 
 
 Este projeto é um sistema simples de cadastro de usuários utilizando Node.js, Express.js e PostgreSQL.
 
