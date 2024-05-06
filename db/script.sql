@@ -1,21 +1,21 @@
-CREATE DATABASE hpexerc;
+CREATE DATABASE herosbattle;
 
-\c hpexerc;
+\c herosbattle;
 
-CREATE TABLE bruxo (
-  id SERIAL PRIMARY KEY,
-  nome VARCHAR(255) NOT NULL,
-  idade INT NOT NULL,
-  casa VARCHAR(255) NOT NULL,
-  habilidade VARCHAR(255) NOT NULL,
-  sangue VARCHAR(255) NOT NULL,
-  patrono VARCHAR(255) 
+CREATE TABLE heroes (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    health INT NOT NULL,
+    attack INT NOT NULL,
+    defense INT NOT NULL
 );
 
-CREATE TABLE varinha (
-  id SERIAL PRIMARY KEY,
-  material VARCHAR(255) NOT NULL,
-  comprimento INT NOT NULL,
-  nucleo VARCHAR(255) NOT NULL,
-  data_fabric INT NOT NULL
+CREATE TABLE battle (
+    id SERIAL PRIMARY KEY,
+    hero1_id INT NOT NULL,
+    hero2_id INT NOT NULL,
+    winner_id INT,
+    FOREIGN KEY (hero1_id) REFERENCES heroes(id),
+    FOREIGN KEY (hero2_id) REFERENCES heroes(id),
+    FOREIGN KEY (winner_id) REFERENCES heroes(id)
 );
